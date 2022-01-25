@@ -24,19 +24,6 @@ tspan = [0 period*num_orbits];
 
 %Integrate EOM
 [tout, stateout] = ode45(@CubeSAT, tspan, stateinitial);
-xout = stateout(:,1);
-yout = stateout(:,2);
-zout = stateout(:,3);
 
 %Plot
-[X,Y,Z] = sphere;
-X = X*R;
-Y = Y*R;
-Z = Z*R;
-
-fig = figure();
-plot3(xout,yout,zout)
-grid on
-hold on
-mesh(X,Y,Z);
-axis equal
+fig = figure
