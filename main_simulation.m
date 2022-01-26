@@ -1,14 +1,15 @@
+%Initialise
+clear
+clc
+close all
+global BxI ByI BzI
+
 % Based on ECI frame of earth
 Earth
 
 %ICs
 altitude = 600e3;  %Approximate orbit altitude of CubeSAT
 inclination = 0;                      %Equatorial orbit
-
-%IGRF Setup
-IGRF_setup
-% Usage: [BX, BY, BZ] = IGRF(TIME, LATITUDE, LONGITUDE, ALTITUDE, COORD)
-[Bx, By, Bz] = igrf('01-Jan-2020',0,0,600) %nanotesla
 
 x0 = R + altitude
 y0 = 0;
@@ -29,11 +30,25 @@ tspan = [0;period*num_orbits];
 
 %Integrate EOM
 [tout, stateout] = ode45(@CubeSAT, tspan, stateinitial);
+
+%Initialise vectors then loop through stateout to extract magnetic field
+BxIout = 0*length(stateout);
+ByIout = BxIout;
+BzIout = BxIout;
+
+for idx = 1:length(tout)
+    dstatedt = CubeSAT(tout(idx), stateout(idx,:));
+    BxIout(idx) = BxI;
+    ByIout(idx) = ByI;
+    BzIout(idx) = BzI;
+end
+
+%State Vector
 xout = stateout(:,1);
 yout = stateout(:,2);
 zout = stateout(:,3);
 
-%Plot
+%Plot orbit
 [X,Y,Z] = sphere;
 X = X*R;
 Y = Y*R;
@@ -45,3 +60,14 @@ grid on
 hold on
 surf(X,Y,Z);
 axis equal
+
+%Plot magnetic field 
+fig2 = figure();
+plot(tout,BxIout)
+hold on
+grid on
+plot(tout,ByIout)
+plot(tout,BzIout)
+xlabel('Time (sec)');
+ylabel('Magnetic Field (nT)');
+legend('x','y','z');
