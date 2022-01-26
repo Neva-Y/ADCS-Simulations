@@ -8,8 +8,8 @@ global BxI ByI BzI
 Earth
 
 %ICs
-altitude = 600e3;  %Approximate orbit altitude of CubeSAT
-inclination = 0;                      %Equatorial orbit
+altitude = 400e3;  %Approximate orbit altitude of CubeSAT in meters
+inclination = 0;   %Change orbit inclination here, 0 is equitorial
 
 x0 = R + altitude
 y0 = 0;
@@ -55,7 +55,7 @@ Y = Y*R;
 Z = Z*R;
 
 fig = figure();
-plot3(xout,yout,zout)
+plot3(xout,yout,zout, 'LineWidth', 3)
 grid on
 hold on
 surf(X,Y,Z);
@@ -63,11 +63,11 @@ axis equal
 
 %Plot magnetic field 
 fig2 = figure();
-plot(tout,BxIout)
+plot(tout,BxIout, 'LineWidth', 2)
 hold on
 grid on
-plot(tout,ByIout)
-plot(tout,BzIout)
+plot(tout,ByIout, 'LineWidth', 2)
+plot(tout,BzIout, 'LineWidth', 2)
 xlabel('Time (sec)');
 ylabel('Magnetic Field (nT)');
 legend('x','y','z');
