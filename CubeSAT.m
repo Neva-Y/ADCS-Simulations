@@ -32,7 +32,6 @@ longditude = psiE*180/pi;
 rhokm = rho/1000; %km
 
 %IGRF Setup
-IGRF_setup
 % Usage: [BX, BY, BZ] = IGRF(TIME, LATITUDE, LONGITUDE, ALTITUDE, COORD)
 [BN, BE, BD] = igrf('01-Jan-2000', latitude, longditude, rhokm, 'geocentric');
 % Convert from NED frame to Inertial frame
