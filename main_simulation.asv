@@ -11,7 +11,7 @@ Earth
 altitude = 600e3;  %Approximate orbit altitude of CubeSAT in meters
 inclination = 45*pi/180;   %Change orbit inclination here, 0 is equitorial
 
-x0 = R + altitude;
+x0 = R + altitude
 y0 = 0;
 z0 = 0;
 semi_major_axis = norm([x0,y0,z0]);   %Circular orbit
@@ -28,7 +28,7 @@ ptp0 = [phi0;theta0;psi0];
 q0123_0 = EulerAngles2Quaternions(ptp0); %Express in quarternions to avoid singularities
 
 %Angular velocities (body frame)
-p0 = 0.01;
+p0 = 0;
 q0 = 0;
 r0 = 0;
 
@@ -78,7 +78,7 @@ hold on
 surf(X,Y,Z);
 axis equal
 
-%Plot magnetic field and the norm
+%Plot magnetic field 
 fig2 = figure();
 plot(tout,BxIout, 'LineWidth', 2)
 hold on
@@ -89,24 +89,6 @@ xlabel('Time (sec)');
 ylabel('Magnetic Field (µT)');
 legend('x','y','z');
 
+%Plot Angluar Velocity
 fig3 = figure();
-Bnorm = sqrt(BxIout.^2 + ByIout.^2 + BzIout.^2);
-plot(tout, Bnorm, 'LineWidth', 2)
-xlabel('Time (sec)');
-ylabel('Magnetic Field Magnitude (µT)');
-grid on
-
-%Plot Euler Angles in degrees
-ptpout_deg = ptpout.*(180/pi);
-fig4 = figure();
-plot(tout, ptpout_deg, 'LineWidth', 2)
-grid on
-xlabel('Time (sec)');
-ylabel('Angles (deg)');
-
-%Plot Angular Velocity
-fig5 = figure();
-plot(tout, pqrout, 'LineWidth', 2)
-grid on
-xlabel('Time (sec)');
-ylabel('Angular Velocity (rad/s)');
+set(fig3,

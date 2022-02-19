@@ -11,8 +11,7 @@ zdot = state(6);
 
 % inertia and mass
 m = 3; %kg
-I = [5/6 0 0; 0 5/6 0;0 0 1/6]; %For cuboid where a=1,b=1,c=3
-invI = inv(I);
+I = [5/6 0 0; 0 5/6 0;0 0 1/6] %For cuboid where a=1,b=1,c=3
 
 % Translational kinematics
 vel = state(4:6);
@@ -22,7 +21,6 @@ q0123 = state(7:10);
 p = state(11);
 q = state(12);
 r = state(13);
-pqr = state(11:13);
 PQRMAT = [0 -p -q -r;p 0 r -q;q -r 0 p;r q -p 0];
 q0123dot = 1/2*PQRMAT*q0123;
 
@@ -54,13 +52,8 @@ BzI = BI(3);
 F = Fgrav; %ignore solar radiation pressure & aerodynamic drag
 accel = F/m;
 
-
-%Magnetorquer
-LMN_magtorquers = [0;0;0];
-
 % Rotational Dynamics
-H = I*pqr;
-pqrdot = invI*(LMN_magtorquers - cross(pqr,H));
+PQR
 
 %Derivatives vector
-dstatedt = [vel;accel;q0123dot;pqrdot];
+dstatedt = [vel;accel];
