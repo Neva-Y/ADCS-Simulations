@@ -10,7 +10,7 @@ ydot = state(5);
 zdot = state(6);
 
 % inertia and mass
-m = 3; %kg
+m = 4; %kg
 I = [5/6 0 0; 0 5/6 0;0 0 1/6]; %For cuboid where a=1,b=1,c=3
 invI = inv(I);
 
@@ -40,15 +40,15 @@ psiE = atan2(y,x);
 latitude = 90-thetaE*180/pi;
 longditude = psiE*180/pi;
 
-%IGRF Setup
+%IGRF Setup, output in nT so convert to T
 % Usage: [BX, BY, BZ] = IGRF(TIME, LATITUDE, LONGITUDE, ALTITUDE, COORD)
 [BN, BE, BD] = igrf('01-Jan-2000', latitude, longditude, rho/1000, 'geocentric');
 % Convert from NED frame to Inertial frame
 BNED = [BN; BE; -BD];  %ECI frame has Down as Up
 BI = TIB(phiE, thetaE+pi, psiE)*BNED;
-BxI = BI(1);
-ByI = BI(2);
-BzI = BI(3);
+BxI = BI(1)*1e-9;
+ByI = BI(2)*1e-9;
+BzI = BI(3)*1e-9;
 
 % Translational Dynamics
 F = Fgrav; %ignore solar radiation pressure & aerodynamic drag

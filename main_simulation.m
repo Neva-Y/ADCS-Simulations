@@ -29,8 +29,8 @@ q0123_0 = EulerAngles2Quaternions(ptp0); %Express in quarternions to avoid singu
 
 %Angular velocities (body frame)
 p0 = 0.01;
-q0 = 0;
-r0 = 0;
+q0 = 0.08;
+r0 = 0.05;
 
 stateinitial = [x0;y0;z0;xdot0;ydot0;zdot0;q0123_0;p0;q0;r0];
 
@@ -49,12 +49,12 @@ BxIout = 0*length(stateout);
 ByIout = BxIout;
 BzIout = BxIout;
 
-%Convert to microteslas
+%Convert to Teslas
 for idx = 1:length(tout)
     dstatedt = CubeSAT(tout(idx), stateout(idx,:)');
-    BxIout(idx) = BxI/1000;
-    ByIout(idx) = ByI/1000;
-    BzIout(idx) = BzI/1000;
+    BxIout(idx) = BxI;
+    ByIout(idx) = ByI;
+    BzIout(idx) = BzI;
 end
 
 %State Vector
@@ -86,14 +86,14 @@ grid on
 plot(tout,ByIout, 'LineWidth', 2)
 plot(tout,BzIout, 'LineWidth', 2)
 xlabel('Time (sec)');
-ylabel('Magnetic Field (µT)');
+ylabel('Magnetic Field (T)');
 legend('x','y','z');
 
 fig3 = figure();
 Bnorm = sqrt(BxIout.^2 + ByIout.^2 + BzIout.^2);
 plot(tout, Bnorm, 'LineWidth', 2)
 xlabel('Time (sec)');
-ylabel('Magnetic Field Magnitude (µT)');
+ylabel('Magnetic Field Magnitude (T)');
 grid on
 
 %Plot Euler Angles in degrees

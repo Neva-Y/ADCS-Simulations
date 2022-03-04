@@ -12,4 +12,3 @@ l_wire = N*2*pi*r;
 R = (Rho*l_wire)/(pi*r_wire^2); %resistance of wire
 Nd = (4*(log(l/r)-1))/((l/r)^2-4*log(l/r));
 mu = pi*r^2*N*(1+(mu_r-1)/(1+(mu_r-1)*Nd)); %magnetic dipole
- 
