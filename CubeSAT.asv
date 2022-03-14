@@ -53,13 +53,12 @@ if t >= lastMagUpdate
     BxI = BI(1)*1e-9;
     ByI = BI(2)*1e-9;
     BzI = BI(3)*1e-9;
-    %BB = TIBquat
+    BB = TIBquat
 end
 
-% if t >= lastSensorUpdate
-%     lastSensorUpdate = lastSensorUpdate + nextSensorUpdate;
-%     [BfieldMeasured, pqrMeasured] = Sensor(BB,pqr);
-% end
+if t >= lastSensorUpdate
+    lastSensorUpdate = lastSensorUpdate + nextSensorUpdate;
+    [BfieldMeasured, pqrMeasured] = Sensor(BB,pqr);
 
 
 % Translational Dynamics

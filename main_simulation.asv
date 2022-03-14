@@ -3,7 +3,7 @@ clear
 clc
 close all
 tic
-global BxI ByI BzI lastMagUpdate nextMagUpdate lastSensorUpdate nextSensorUpdate
+global BxI ByI BzI lastMagUpdate nextMagUpdate
 
 % Based on ECI frame of earth
 Earth
@@ -41,7 +41,7 @@ state = [x0;y0;z0;xdot0;ydot0;zdot0;q0123_0;p0;q0;r0];
 period = 2*pi*sqrt(semi_major_axis^3/mu); %Kepler's third law
 num_orbits = 1;
 tfinal = period*num_orbits;
-timestep = 1; %Determines how often the RK4 model is called
+timestep = 10;
 tout = 0:timestep:tfinal;
 stateout = zeros(length(tout), length(state));
 %tspan = [0;period*num_orbits];
@@ -54,14 +54,8 @@ stateout = zeros(length(tout), length(state));
 BxIout = 0*length(stateout);
 ByIout = BxIout;
 BzIout = BxIout;
-nextMagUpdate = 100; %determines how often the IGRF model is called
+nextMagUpdate = 100; %determines 
 lastMagUpdate = 0;
-
-%Sensor Parameters
-lastSensorUpdate = 0;
-nextSensorUpdate = 1;
-sensor_params
-
 
 %Convert to Teslas
 for idx = 1:length(tout)
