@@ -4,10 +4,15 @@ clc
 close all
 tic
 global BI BB lastMagUpdate nextMagUpdate lastSensorUpdate nextSensorUpdate
-global BfieldMeasured pqrMeasured
+global BfieldMeasured pqrMeasured invI m I
 
 % Based on ECI frame of earth
 Earth
+
+% CubeSAT inertia and mass
+m = 4; %kg
+I = [5/6 0 0; 0 5/6 0;0 0 1/6]; %For cuboid where a=1,b=1,c=3
+invI = inv(I);
 
 %ICs for postiion and velocity
 altitude = 600e3;  %Approximate orbit altitude of CubeSAT in meters
@@ -39,9 +44,9 @@ state = [x0;y0;z0;xdot0;ydot0;zdot0;q0123_0;p0;q0;r0];
 
 %Orbital period (Assume circular orbit)
 period = 2*pi*sqrt(semi_major_axis^3/mu); %Kepler's third law
-num_orbits = 1;
+num_orbits = 7;
 tfinal = period*num_orbits;
-timestep = 1; %Determines how often the RK4 model is called
+timestep = 4; %Determines how often the RK4 model is called
 tout = 0:timestep:tfinal;
 stateout = zeros(length(tout), length(state));
 %tspan = [0;period*num_orbits];
@@ -71,7 +76,8 @@ nextSensorUpdate = 1; %Determines how often the sensors are polled
 lastSensorUpdate = 0;
 sensor_params
 
-
+next = 100;
+lastPrint = 0;
 %Convert to Teslas
 for idx = 1:length(tout)
     %Save current state
@@ -99,6 +105,12 @@ for idx = 1:length(tout)
     BxBm(idx) = BfieldMeasured(1);
     ByBm(idx) = BfieldMeasured(2);
     BzBm(idx) = BfieldMeasured(3);
+    
+    %Print simulation time
+    if tout(idx) > lastPrint
+        disp(['Time = ',num2str(tout(idx)),' out of ',num2str(tfinal)])
+        lastPrint = lastPrint + next;
+    end
 
 end
 
@@ -144,7 +156,7 @@ title("Translational Orbit")
 % grid on
 % title("Magnetic Field Magnitude in ECI frame");
 
-%Plot Body frame magnetic field and the norm
+%Plot Body frame magnetic field
 fig4 = figure();
 plot(tout,BxBout, 'LineWidth', 1)
 hold on
@@ -155,14 +167,6 @@ xlabel('Time (sec)');
 ylabel('Magnetic Field (T)');
 legend('x','y','z');
 title("Magnetic Field in Body frame");
-
-fig5 = figure();
-BBnorm = sqrt(BxBout.^2 + ByBout.^2 + BzBout.^2);
-plot(tout, BBnorm, 'LineWidth', 2)
-xlabel('Time (sec)');
-ylabel('Magnetic Field Magnitude (T)');
-grid on
-title("Magnetic Field Magnitude in Body frame");
 
 %Plot Euler Angles in degrees
 ptpout_deg = ptpout.*(180/pi);

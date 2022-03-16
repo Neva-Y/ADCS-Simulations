@@ -1,7 +1,7 @@
 function dstatedt = CubeSAT(t, state)
 %Globals
 global BI BB lastMagUpdate nextMagUpdate lastSensorUpdate nextSensorUpdate 
-global BfieldMeasured pqrMeasured invI m I
+global BfieldMeasured pqrMeasured
 
 x = state(1);
 y = state(2);
@@ -9,6 +9,10 @@ z = state(3);
 xdot = state(4);
 ydot = state(5);
 zdot = state(6);
+
+% inertia and mass
+m = 4; %kg
+I = [5/6 0 0; 0 5/6 0;0 0 1/6]; %For cuboid where a=1,b=1,c=3
 
 % Translational kinematics
 vel = [xdot;ydot;zdot];
@@ -64,14 +68,12 @@ F = Fgrav; %ignore solar radiation pressure & aerodynamic drag
 accel = F/m;
 
 % Magnetorquer
-magnetorquer_params;
 current = controls(BfieldMeasured,pqrMeasured);
-muB = current*mu;
-LMN_magtorquers = cross(muB,BB);
+LMN_magtorquers = cross
 
 % Rotational Dynamics
 H = I*pqr;
-pqrdot = invI*(LMN_magtorquers - cross(pqr,H));
+pqrdot = I\(LMN_magtorquers - cross(pqr,H));
 
 % Derivatives vector
 dstatedt = [vel;accel;q0123dot;pqrdot];
