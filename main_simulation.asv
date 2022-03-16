@@ -3,7 +3,8 @@ clear
 clc
 close all
 tic
-global BxI ByI BzI lastMagUpdate nextMagUpdate
+global BI BB lastMagUpdate nextMagUpdate lastSensorUpdate nextSensorUpdate
+global BfieldMeasured pqrMeasured
 
 % Based on ECI frame of earth
 Earth
@@ -28,7 +29,7 @@ psi0 = 0;
 ptp0 = [phi0;theta0;psi0];
 q0123_0 = EulerAngles2Quaternions(ptp0); %Express in quarternions to avoid singularities
 
-%Angular velocities (body frame)
+%Angular velocities (Body Frame)
 p0 = 0.01;
 q0 = 0.08;
 r0 = 0.05;
@@ -36,30 +37,44 @@ r0 = 0.05;
 state = [x0;y0;z0;xdot0;ydot0;zdot0;q0123_0;p0;q0;r0];
 
 
-
 %Orbital period (Assume circular orbit)
 period = 2*pi*sqrt(semi_major_axis^3/mu); %Kepler's third law
 num_orbits = 1;
 tfinal = period*num_orbits;
-timestep = 10;
+timestep = 1; %Determines how often the RK4 model is called
 tout = 0:timestep:tfinal;
 stateout = zeros(length(tout), length(state));
 %tspan = [0;period*num_orbits];
 
-%Integrate EOM
+%Integrate EOM with ODE45
 %[tout, stateout] = ode45(@CubeSAT, tspan, stateinitial);
 
 
 %Initialise vectors then loop through stateout to extract magnetic field
-BxIout = 0*length(stateout);
-ByIout = BxIout;
-BzIout = BxIout;
-nextMagUpdate = 100; %determines 
+BxIout = zeros(length(stateout));
+ByIout = zeros(length(stateout));
+BzIout = zeros(length(stateout));
+
+BxBout = zeros(length(stateout));
+ByBout = zeros(length(stateout));
+BzBout = zeros(length(stateout));
+
+BxBm = zeros(length(stateout));
+ByBm = zeros(length(stateout));
+BzBm = zeros(length(stateout));
+
+nextMagUpdate = 100; %Determines how often the IGRF model is called
 lastMagUpdate = 0;
+
+%Sensor Parameters
+nextSensorUpdate = 1; %Determines how often the sensor is polled
+lastSensorUpdate = 0;
+sensor_params
+
 
 %Convert to Teslas
 for idx = 1:length(tout)
-    % save current state
+    %Save current state
     stateout(idx,:) = state';
     
     %Runge-Kutta 4 function calls
@@ -71,9 +86,20 @@ for idx = 1:length(tout)
     state = state + phi_RK*timestep;
 
     %dstatedt = CubeSAT(tout(idx), stateout(idx,:)');
-    BxIout(idx) = BxI;
-    ByIout(idx) = ByI;
-    BzIout(idx) = BzI;
+    %Save Magnetic Field Data
+    BxIout(idx) = BI(1);
+    ByIout(idx) = BI(2);
+    BzIout(idx) = BI(3);
+
+    BxBout(idx) = BB(1);
+    ByBout(idx) = BB(2);
+    BzBout(idx) = BB(3);
+
+    %Add noise to body frame magnetic field measurements
+    BxBm(idx) = BfieldMeasured(1);
+    ByBm(idx) = BfieldMeasured(2);
+    BzBm(idx) = BfieldMeasured(3);
+
 end
 
 %State Vector
@@ -96,8 +122,9 @@ grid on
 hold on
 surf(X,Y,Z);
 axis equal
+title("Translational Orbit")
 
-%Plot magnetic field and the norm
+%Plot ECI frame magnetic field and the norm
 fig2 = figure();
 plot(tout,BxIout, 'LineWidth', 2)
 hold on
@@ -107,27 +134,52 @@ plot(tout,BzIout, 'LineWidth', 2)
 xlabel('Time (sec)');
 ylabel('Magnetic Field (T)');
 legend('x','y','z');
+title("Magnetic Field in ECI frame");
 
 fig3 = figure();
-Bnorm = sqrt(BxIout.^2 + ByIout.^2 + BzIout.^2);
-plot(tout, Bnorm, 'LineWidth', 2)
+BInorm = sqrt(BxIout.^2 + ByIout.^2 + BzIout.^2);
+plot(tout, BInorm, 'LineWidth', 2)
 xlabel('Time (sec)');
 ylabel('Magnetic Field Magnitude (T)');
 grid on
+title("Magnetic Field Magnitude in ECI frame");
+
+%Plot Body frame magnetic field and the norm
+fig4 = figure();
+plot(tout, BxBout, 'LineWidth', 2)
+hold on
+grid on
+plot(tout, ByBout, 'LineWidth', 2)
+plot(tout, BzBout, 'LineWidth', 2)
+xlabel('Time (sec)');
+ylabel('Magnetic Field (T)');
+legend('x','y','z');
+title("Magnetic Field in Body frame");
+
+fig5 = figure();
+BBnorm = sqrt(BxBout.^2 + ByBout.^2 + BzBout.^2);
+plot(tout, BBnorm, 'LineWidth', 2)
+xlabel('Time (sec)');
+ylabel('Magnetic Field Magnitude (T)');
+grid on
+title("Magnetic Field Magnitude in Body frame");
 
 %Plot Euler Angles in degrees
 ptpout_deg = ptpout.*(180/pi);
-fig4 = figure();
+fig6 = figure();
 plot(tout, ptpout_deg, 'LineWidth', 2)
 grid on
 xlabel('Time (sec)');
 ylabel('Angles (deg)');
+title("CubeSat Attitude in Degrees");
+
 
 %Plot Angular Velocity
-fig5 = figure();
+fig7 = figure();
 plot(tout, pqrout, 'LineWidth', 2)
 grid on
 xlabel('Time (sec)');
 ylabel('Angular Velocity (rad/s)');
+title("CubeSat Angular Velocity");
 
 toc

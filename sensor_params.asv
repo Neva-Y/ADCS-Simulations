@@ -1,4 +1,0 @@
-MagScaleBias = 4e-7 %Teslas
-MagFieldBias = MagScaleBias*(2*rand() - 1); %scaled randomly from -1 to 1
-
-MagFieldNoise = 
